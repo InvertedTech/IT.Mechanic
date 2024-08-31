@@ -1,4 +1,6 @@
 ﻿using IT.Mechanic.Models.Configuration.Hosting;
+using System;
+using System.Collections.Generic;
 
 namespace IT.Mechanic.Models.Configuration
 {
@@ -25,6 +27,34 @@ namespace IT.Mechanic.Models.Configuration
             AWS,
             GCP,
             Invertedtech,
+        }
+
+        public static IEnumerable<string> GetHostingProvidersNames()
+        {
+            return Enum.GetNames(typeof(HostingProviderEnum));
+        }
+
+        public static HostingProviderEnum GetHostingProviderFromName(string name)
+        {
+            switch (name)
+            {
+                case "Expert Mode":
+                    return HostingProviderEnum.Expertmode;
+                case "Rumble":
+                    return HostingProviderEnum.Rumble;
+                case "Digital Ocean":
+                    return HostingProviderEnum.Digitalocean;
+                case "Azure":
+                    return HostingProviderEnum.Azure;
+                case "AWS":
+                    return HostingProviderEnum.AWS;
+                case "GCP":
+                    return HostingProviderEnum.GCP;
+                case "Inverted Tech":
+                    return HostingProviderEnum.Invertedtech;
+                default:
+                    return HostingProviderEnum.Rumble;
+            }
         }
     }
 }
