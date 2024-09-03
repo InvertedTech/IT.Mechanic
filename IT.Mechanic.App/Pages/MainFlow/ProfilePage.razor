@@ -1,0 +1,104 @@
+﻿
+@page "/profiles/{profileId}"
+@using IT.Mechanic.App.Services.Profiles
+@using IT.Mechanic.Models.Configuration
+@inject IDialogService DialogService
+@inject IProfileService _profileService
+@inject NavigationManager Navigation
+
+<MudAppBar>
+    <MudToolBar>
+        <MudIconButton Icon="@Icons.Material.Filled.ArrowBack" Color="Color.Default" @onclick="OnBackClicked" Class="mr-auto" />
+        <MudToggleIconButton @bind-Toggled="IsServerRunningToggle" Icon="@Icons.Material.Filled.PlayArrow" ToggledIcon="@Icons.Material.Filled.Stop" Color="Color.Success" ToggledColor="Color.Error" />
+        <MudToggleIconButton @bind-Toggled="UpdateSoftwareToggle" Icon="@Icons.Material.Filled.Update" ToggledIcon="@Icons.Material.Filled.UpdateDisabled" Color="Color.Warning" ToggledColor="Color.Default" />
+        <MudMenu Icon="@Icons.Material.Filled.Merge" Color="Color.Default" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopRight">
+            <MudMenuItem>Change Server Provider</MudMenuItem>
+            <MudMenuItem>Migrate Location</MudMenuItem>
+            <MudMenuItem>Size</MudMenuItem>
+        </MudMenu><MudMenu Icon="@Icons.Material.Filled.Backup" Color="Color.Info" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopRight">
+            <MudMenuItem>Backup</MudMenuItem>
+            <MudMenuItem>Install New Backup Service</MudMenuItem>
+        </MudMenu>
+        <MudMenu Icon="@Icons.Material.Filled.Dns" Color="Color.Default" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopRight">
+            <MudMenuItem>Change DNS Name</MudMenuItem>
+            <MudMenuItem>Chanege DNS Provider</MudMenuItem>
+        </MudMenu>
+        <MudMenu Icon="@Icons.Material.Filled.Delete" Color="Color.Error" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopRight">
+            <MudMenuItem>Backup and Delete</MudMenuItem>
+            <MudMenuItem @onclick="OnForceDeleteClicked">Force Delete</MudMenuItem>
+        </MudMenu>
+    </MudToolBar>
+</MudAppBar>
+<MudPaper Width="300" Elevation="15">
+    <MudText Typo="Typo.h4">@Profile.DNS.DomainName</MudText>
+    <MudExpansionPanels MultiExpansion="true">
+            <MudExpansionPanel Text="DNS Settings">
+            <MudStack Row="true">
+                <MudText Typo="Typo.subtitle1">Domain Name:</MudText>
+                <MudText Typo="Typo.subtitle2">@Profile.DNS.DomainName</MudText>
+            </MudStack>
+            <MudStack Row="true">
+                <MudText Typo="Typo.subtitle1">DNS Provider:</MudText>
+                <MudText Typo="Typo.subtitle2">@Profile.DNS.Provider</MudText>
+            </MudStack>
+        </MudExpansionPanel>
+            <MudExpansionPanel Text="Server Settings">
+                <MudStack Row="true">
+                    <MudText Typo="Typo.subtitle1">Server Name:</MudText>
+                    <MudText Typo="Typo.subtitle2">@Profile.Server.ServerName</MudText>
+                </MudStack>
+                <MudStack Row="true">
+                    <MudText Typo="Typo.subtitle1">Server User:</MudText>
+                    <MudText Typo="Typo.subtitle2">@Profile.Server.User</MudText>
+                </MudStack>
+                <MudStack Row="true">
+                    <MudText Typo="Typo.subtitle1">Hosting Provider:</MudText>
+                    <MudText Typo="Typo.subtitle2">@Profile.Server.HostingProvider</MudText>
+                </MudStack>
+                <MudStack Row="true">
+                    <MudText Typo="Typo.subtitle1">Public IP:</MudText>
+                    <MudText Typo="Typo.subtitle2">@Profile.Server.PublicIP</MudText>
+                </MudStack>
+                <MudStack Row="true">
+                    <MudText Typo="Typo.subtitle1">SSH Private Key:</MudText>
+                    <MudText Typo="Typo.subtitle2">@Profile.Server.SSHPrivateKey</MudText>
+                </MudStack>
+        </MudExpansionPanel>
+    </MudExpansionPanels>
+</MudPaper>
+
+    <MudMessageBox @ref="_mudMessageBox" Title="Warning" CancelText="Cancel">
+        <MessageContent>
+            Deleting can <b><i>not</i></b> be undone!
+        </MessageContent>
+        <YesButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Error" StartIcon="@Icons.Material.Filled.DeleteForever">Delete!</MudButton>
+        </YesButton>
+    </MudMessageBox>
+
+    @code {
+    private MudMessageBox _mudMessageBox;
+    public bool UpdateSoftwareToggle { get; set; } = false;
+    public bool IsServerRunningToggle { get; set; } = false;
+    [Parameter]
+    public string? ProfileId { get; set; }
+    public MainModel Profile { get; private set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!string.IsNullOrWhiteSpace(ProfileId))
+        {
+            Profile = await _profileService.GetProfileByIdAsync(ProfileId);
+        }
+    }
+
+    public void OnBackClicked()
+    {
+        Navigation.NavigateTo("/");
+    }
+
+    private async void OnForceDeleteClicked()
+    {
+        bool? result = await _mudMessageBox.ShowAsync();
+    }
+}

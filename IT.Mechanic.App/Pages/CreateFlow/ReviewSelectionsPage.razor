@@ -1,0 +1,139 @@
+﻿@page "/create/review"
+@using IT.Mechanic.App.Services.Profiles
+@using IT.Mechanic.App.Services.Settings
+@using IT.Mechanic.Models.Configuration
+@inject NavigationManager Navigation
+@inject IProfileFactory ProfileFactory
+@inject ICredentialService Credentials
+@inject IProfileService Profiles
+
+<MudAppBar>
+    <MudText>Review Selections</MudText>
+</MudAppBar>
+<MudTabs @ref="Tabs">
+    <MudTabPanel Text="Configuration" @ref="ConfigurationTab">
+        <MudCard Class="mr-auto ml-auto" Elevation="20">
+            <MudCardHeader>
+                <MudText>Review Site Configuration</MudText>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudStack Row="true">
+                    <MudText>Website Type:</MudText>
+                    <MudTextField Disabled="true" Value="@ProfileFactory.ProductSelection.WebsiteType" />
+                </MudStack>
+                <MudStack Row="true">
+                    <MudText>DNS Provider</MudText>
+                    <MudTextField Disabled="true" Value="@ProfileFactory.DNS.Provider" />
+                </MudStack>
+                <MudStack Row="true">
+                    <MudText>Server Provider</MudText>
+                    <MudTextField Disabled="true" Value="@ProfileFactory.Server.HostingProvider" />
+                </MudStack>
+            </MudCardContent>
+        </MudCard>
+        <MudButton @onclick="OnBackClicked">
+            <MudText Typo="@Typo.button">Back</MudText>
+        </MudButton><MudButton @onclick="() => Activate(1)">
+            <MudText Typo="@Typo.button">Next</MudText>
+        </MudButton>
+    </MudTabPanel>
+    <MudTabPanel Text="DNS" @ref="@DNSTab">
+        <MudCard Elevation="20" Class="mr-auto ml-auto">
+            <MudCardHeader>
+                <MudText>Review DNS Configuration</MudText>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudStack Row="true">
+                    <MudText>DNS Provider:</MudText>
+                    <MudTextField Disabled="true" Value="@ProfileFactory.DNS.Provider" />
+                </MudStack>
+                <MudStack Row="true">
+                    <MudText>Domain Name:</MudText>
+                    <MudTextField Disabled="true" Value="@ProfileFactory.DNS.DomainName" />
+                </MudStack>
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton @onclick="() => Activate(0)">
+                    <MudText Typo="@Typo.button">Back</MudText>
+                </MudButton><MudButton @onclick="() => Activate(2)">
+                    <MudText Typo="@Typo.button">Next</MudText>
+                </MudButton>
+            </MudCardActions>
+        </MudCard>
+    </MudTabPanel>
+    <MudTabPanel Text="Hosting" @ref="@HostingTab">
+        <MudCard Class="mr-auto ml-auto" Elevation="20">
+            <MudCardHeader>
+                <MudText>Review Server Configuration</MudText>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudStack Row="true">
+                    <MudText>Server Provider</MudText>
+                    <MudTextField Disabled="true" Value="@ProfileFactory.Server.HostingProvider" T="ServerModel.HostingProviderEnum" />
+                </MudStack>
+                <MudStack Row="true">
+                    <MudText>Server Name</MudText>
+                    <MudTextField Disabled="true" Value="@ProfileFactory.Server.ServerName" />
+                </MudStack>
+                <MudStack Row="true">
+                    <MudText>Server User</MudText>
+                    <MudTextField Disabled="true" Value="@ProfileFactory.Server.User" />
+                </MudStack>
+                <MudStack Row="true">
+                    <MudText>Public IP:</MudText>
+                    <MudTextField Disabled="true" Value="@ProfileFactory.Server.PublicIP" />
+                </MudStack>
+                <MudStack Row="true">
+                    <MudText>SSHPrivateKey:</MudText>
+                    <MudTextField Disabled="true" Value="@ProfileFactory.Server.SSHPrivateKey" />
+                </MudStack>
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton @onclick="() => Activate(1)">
+                    <MudText Typo="@Typo.button">Back</MudText>
+                </MudButton><MudButton @onclick="() => Activate(3)">
+                    <MudText Typo="@Typo.button">Next</MudText>
+                </MudButton>
+            </MudCardActions>
+        </MudCard>
+    </MudTabPanel>
+    <MudTabPanel Text="Finalize" @ref="FinalizeTab">
+        <MudCard Elevation="20" Class="mr-auto ml-auto">
+            <MudCardHeader>
+                <MudText>Finalize</MudText>
+            </MudCardHeader>
+            <MudCardActions>
+                <MudButton @onclick="() => Activate(2)">
+                    <MudText Typo="@Typo.button">Back</MudText>
+                </MudButton><MudButton @onclick="OnNextClicked">
+                    <MudText Typo="@Typo.button">Next</MudText>
+                </MudButton>
+            </MudCardActions>
+        </MudCard>
+    </MudTabPanel>
+</MudTabs>
+
+@code {
+    private MudTabs Tabs;
+    private MudTabPanel ConfigurationTab;
+    private MudTabPanel DNSTab;
+    private MudTabPanel HostingTab;
+    private MudTabPanel FinalizeTab;
+
+    private void Activate(int index)
+    {
+        Tabs.ActivatePanel(index);
+    }
+
+    private void OnBackClicked()
+    {
+        Navigation.NavigateTo("/create/hosting");
+    }
+
+    private async void OnNextClicked()
+    {
+        var model = ProfileFactory.BuildProfile();
+        await Profiles.SaveModelAsync(model);
+        Navigation.NavigateTo("/");
+    }
+}
