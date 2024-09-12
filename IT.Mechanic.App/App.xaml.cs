@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using IT.Mechanic.App.Services.Profiles;
 using IT.Mechanic.App.Services.Settings;
+using IT.Mechanic.App.Validators;
 
 namespace IT.Mechanic.App
 {
@@ -11,13 +12,19 @@ namespace IT.Mechanic.App
         private readonly ICredentialService _credentialService;
         private readonly IProfileService _profileService;
         private readonly IProfileFactory _profileFactory;
+        private readonly DNSValidator _dnsValidator;
+        private readonly ServerValidator _serverValidator;
+        private readonly ProductSelectionValidator _productSelectionValidator;
 
         public App(
             JsonSerializerOptions jsonSerializerOptions,
             ISettingsService settingsService,
             ICredentialService credentialService,
             IProfileService profileService,
-            IProfileFactory profileFactory
+            IProfileFactory profileFactory,
+            DNSValidator dnsValidator,
+            ServerValidator serverValidator,
+            ProductSelectionValidator productSelectionValidator
         )
         {
             _jsonSerializerOptions = jsonSerializerOptions;
@@ -32,7 +39,10 @@ namespace IT.Mechanic.App
                 _settingsService,
                 _credentialService,
                 _profileService,
-                _profileFactory
+                _profileFactory,
+                _dnsValidator,
+                _serverValidator,
+                _productSelectionValidator
             );
         }
 
@@ -40,8 +50,8 @@ namespace IT.Mechanic.App
         {
             var window = base.CreateWindow(activationState);
 
-            const int newWidth = 800;
-            const int newHeight = 600;
+            const int newWidth = 1280;
+            const int newHeight = 720;
 
             window.Width = newWidth;
             window.Height = newHeight;

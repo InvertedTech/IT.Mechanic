@@ -1,7 +1,10 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
+using FluentValidation;
 using IT.Mechanic.App.Services.Profiles;
 using IT.Mechanic.App.Services.Settings;
+using IT.Mechanic.App.Validators;
+using IT.Mechanic.App.ViewModels;
 using Microsoft.Extensions.Logging;
 using MudBlazor.Services;
 
@@ -18,7 +21,8 @@ namespace IT.Mechanic.App
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 })
-                .RegisterServices();
+                .RegisterServices()
+                .RegisterValidators();
 #if DEBUG
             builder.Services.AddBlazorWebViewDeveloperTools();
             builder.Logging.AddDebug();
@@ -43,6 +47,16 @@ namespace IT.Mechanic.App
             builder.Services.AddSingleton<ICredentialService, CredentialService>();
             builder.Services.AddSingleton<IProfileService, ProfileService>();
             builder.Services.AddSingleton<IProfileFactory, ProfileFactory>();
+
+            return builder;
+        }
+
+        public static MauiAppBuilder RegisterValidators(this MauiAppBuilder builder)
+        {
+            builder.Services.AddSingleton<DNSValidator>();
+            builder.Services.AddSingleton<ServerValidator>();
+            builder.Services.AddSingleton<ProductSelectionValidator>();
+            builder.Services.AddSingleton<IValidator<SiteConfigViewModel>, SiteConfigValidator>();
 
             return builder;
         }
